@@ -28,31 +28,26 @@ export const Header: React.FC<Props> = ({
     });
   }, [registerFocus]);
 
-  const onSubmit = (event: React.FormEvent) => {
+  const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const trimmed = todo.trim();
 
     if (!trimmed) {
       onInvalid?.();
-      setTimeout(() => inputRef.current?.focus(), 0);
+      requestAnimationFrame(() => inputRef.current?.focus());
 
       return;
     }
 
-    const p = onAdd(trimmed);
-
-    if (p && typeof (p as Promise<unknown>).then === 'function') {
-      (p as Promise<unknown>)
-        .then(() => {
-          setTodo('');
-          setTimeout(() => inputRef.current?.focus(), 0);
-        })
-        .catch(() => {
-          setTimeout(() => inputRef.current?.focus(), 0);
-        });
-    } else {
+    try {
+      await onAdd(trimmed);
+      // clear input only on success
       setTodo('');
-      setTimeout(() => inputRef.current?.focus(), 0);
+    } catch (err) {
+      // keep the entered text on failure — tests expect this behavior
+      // optionally show error handling is done in parent (App)
+    } finally {
+      requestAnimationFrame(() => inputRef.current?.focus());
     }
   };
 
@@ -76,9 +71,7 @@ export const Header: React.FC<Props> = ({
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
           autoFocus
-          ref={el => {
-            inputRef.current = el;
-          }}
+          ref={inputRef}
           value={todo}
           onChange={event => setTodo(event.target.value)}
           disabled={isAdding}

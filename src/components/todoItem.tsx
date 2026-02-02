@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
 import { Todo } from '../types/Todo';
 
 type Props = {
@@ -64,15 +65,10 @@ export const TodoItem: React.FC<Props> = ({
     }
   };
 
-  let todoClass = 'todo';
-
-  if (todo.completed) {
-    todoClass += ' completed';
-  }
-
-  if (isEditing) {
-    todoClass += ' editing';
-  }
+  const todoClass = classNames('todo', {
+    completed: todo.completed,
+    editing: isEditing,
+  });
 
   return (
     <div data-cy="Todo" className={todoClass}>

@@ -10,6 +10,7 @@ import {
   updateTodo,
 } from './api/todos';
 import { Todo } from './types/Todo';
+import { Filter } from './types/Filter';
 import { Header } from './components/formHeader';
 import { FormBody } from './components/formBody';
 import { FormFooter } from './components/formFooter';
@@ -18,7 +19,7 @@ export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loadingId, setLoadingId] = useState<number | null>(null);
   const remainingCount = todos.filter(t => t.id !== -1 && !t.completed).length;
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const [filter, setFilter] = useState<Filter>(Filter.All);
   const allCompleted = todos.length > 0 && todos.every(t => t.completed);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingTodos, setIsLoadingTodos] = useState(true);
@@ -48,7 +49,7 @@ export const App: React.FC = () => {
     setError(null);
   };
 
-  const handleFilterChange = (f: 'all' | 'active' | 'completed') => {
+  const handleFilterChange = (f: Filter) => {
     hideError?.();
     setFilter(f);
     if (filterTimeoutRef.current) {
@@ -86,7 +87,7 @@ export const App: React.FC = () => {
       })
       .catch(err => {
         setLoadingId(null);
-        setTimeout(() => showError('Unable to update a todo'), 0);
+        showError('Unable to update a todo');
 
         return Promise.reject(err);
       });
@@ -99,11 +100,11 @@ export const App: React.FC = () => {
   };
 
   const filteredTodos = todos.filter(todo => {
-    if (appliedFilter === 'active') {
+    if (appliedFilter === Filter.Active) {
       return !todo.completed;
     }
 
-    if (appliedFilter === 'completed') {
+    if (appliedFilter === Filter.Completed) {
       return todo.completed;
     }
 
@@ -143,10 +144,10 @@ export const App: React.FC = () => {
 
         setLoadingId(null);
 
-        setTimeout(() => focusInputRef.current?.(), 0);
+        requestAnimationFrame(() => focusInputRef.current?.());
 
         if (hasFailed) {
-          setTimeout(() => showError('Unable to delete a todo'), 0);
+          showError('Unable to delete a todo');
 
           return Promise.reject();
         }
@@ -155,7 +156,7 @@ export const App: React.FC = () => {
       })
       .catch(() => {
         setLoadingId(null);
-        setTimeout(() => showError('Unable to delete a todo'), 0);
+        showError('Unable to delete a todo');
 
         return Promise.reject();
       });
@@ -219,7 +220,7 @@ export const App: React.FC = () => {
       .then(() => {
         setTodos(prev => prev.filter(todo => todo.id !== id));
         setLoadingId(null);
-        setTimeout(() => focusInputRef.current?.(), 0);
+        requestAnimationFrame(() => focusInputRef.current?.());
       })
       .catch(() => {
         setLoadingId(null);
@@ -242,7 +243,7 @@ export const App: React.FC = () => {
       })
       .catch(() => {
         setLoadingId(null);
-        setTimeout(() => showError('Unable to update a todo'), 0);
+        showError('Unable to update a todo');
       });
   };
 
@@ -259,7 +260,7 @@ export const App: React.FC = () => {
       })
       .catch(() => {
         setLoadingId(null);
-        setTimeout(() => showError('Unable to update a todo'), 0);
+        showError('Unable to update a todo');
       });
   };
 

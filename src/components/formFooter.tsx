@@ -1,3 +1,5 @@
+import { Filter } from '../types/Filter';
+
 export const FormFooter = ({
   remainingCount,
   filter,
@@ -6,33 +8,16 @@ export const FormFooter = ({
   onClearCompleted,
 }: {
   remainingCount: number;
-  filter: 'all' | 'active' | 'completed';
-  onFilterChange: (f: 'all' | 'active' | 'completed') => void;
+  filter: Filter;
+  onFilterChange: (f: Filter) => void;
   hasCompleted: boolean;
   onClearCompleted: () => Promise<void> | void;
 }) => {
   const filters = [
-    { value: 'all', label: 'All', cy: 'FilterLinkAll' },
-    { value: 'active', label: 'Active', cy: 'FilterLinkActive' },
-    { value: 'completed', label: 'Completed', cy: 'FilterLinkCompleted' },
+    { value: Filter.All, label: 'All', cy: 'FilterLinkAll' },
+    { value: Filter.Active, label: 'Active', cy: 'FilterLinkActive' },
+    { value: Filter.Completed, label: 'Completed', cy: 'FilterLinkCompleted' },
   ];
-
-  {
-    filters.map(f => (
-      <a
-        key={f.value}
-        href={`#/ ${f.value}`}
-        className={`filter__link ${f.value === filter ? 'selected' : ''}`}
-        data-cy={f.cy}
-        onClick={e => {
-          e.preventDefault();
-          onFilterChange(f.value as 'all' | 'active' | 'completed');
-        }}
-      >
-        {f.label}
-      </a>
-    ));
-  }
 
   return (
     <footer className="todoapp__footer" data-cy="Footer">
@@ -41,41 +26,20 @@ export const FormFooter = ({
       </span>
 
       <nav className="filter" data-cy="Filter">
-        <a
-          href="#/"
-          className={`filter__link ${filter === 'all' ? 'selected' : ''}`}
-          data-cy="FilterLinkAll"
-          onClick={e => {
-            e.preventDefault();
-            onFilterChange('all');
-          }}
-        >
-          All
-        </a>
-
-        <a
-          href="#/active"
-          className={`filter__link ${filter === 'active' ? 'selected' : ''}`}
-          data-cy="FilterLinkActive"
-          onClick={e => {
-            e.preventDefault();
-            onFilterChange('active');
-          }}
-        >
-          Active
-        </a>
-
-        <a
-          href="#/completed"
-          className={`filter__link ${filter === 'completed' ? 'selected' : ''}`}
-          data-cy="FilterLinkCompleted"
-          onClick={e => {
-            e.preventDefault();
-            onFilterChange('completed');
-          }}
-        >
-          Completed
-        </a>
+        {filters.map(f => (
+          <a
+            key={f.value}
+            href={`#/${f.value}`}
+            className={`filter__link ${filter === f.value ? 'selected' : ''}`}
+            data-cy={f.cy}
+            onClick={e => {
+              e.preventDefault();
+              onFilterChange(f.value);
+            }}
+          >
+            {f.label}
+          </a>
+        ))}
       </nav>
 
       <button
